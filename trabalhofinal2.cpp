@@ -17,7 +17,7 @@ struct RegistroVenda {
     double precoUnitario;
     std::string dataVenda;
 };
-
+//Menu de escolhas p/ o usuariio
 int mostrarMenu() {
     int escolha;
 
@@ -28,22 +28,26 @@ int mostrarMenu() {
     std::cout << "4. Produto mais rentável (faturamento)\n";
     std::cout << "5. Encerrar programa\n";
     std::cout << "====================================\n";
-    std::cout << "Informe sua escolha: ";
+    std::cout << "Digite sua escolha: ";
 
+    //garante que o usuario escolha uma opcão valida
     while (!(std::cin >> escolha) || escolha < 1 || escolha > 5) {
         std::cout << "Opção inválida! Selecione um número entre 1 e 5: ";
         std::cin.clear();
         std::cin.ignore(1000, '\n');
     }
-
+//retrona para as opcoes
     return escolha;
 }
-
-bool importarDadosVendas(std::vector<RegistroVenda>& listaVendas) {
+//Recebe um vetor por referência para armazenar os dados importados.
+bool importarDadosVendas(std::vector<RegistroVenda> &listaVendas) {
     std::string nomeArquivo;
+
+    //Pede o nome do arquivo CSV.
     std::cout << "Informe o nome do arquivo CSV: ";
     std::cin >> nomeArquivo;
 
+    //Tenta abrir o arquivo; se não conseguir, exibe erro.
     std::ifstream arquivo(nomeArquivo);
     if (!arquivo.is_open()) {
         std::cout << "Erro ao tentar abrir o arquivo: " << nomeArquivo << std::endl;
@@ -52,6 +56,10 @@ bool importarDadosVendas(std::vector<RegistroVenda>& listaVendas) {
 
     std::string linha;
     std::getline(arquivo, linha); // ignora cabeçalho
+
+    //Para cada linha do arquivo:
+    //Usa stringstream para dividir os campos por vírgula.
+    //Converte os valores com stoi (string para int) e stod (string para double).
 
     while (std::getline(arquivo, linha)) {
         std::stringstream ss(linha);
@@ -71,26 +79,28 @@ bool importarDadosVendas(std::vector<RegistroVenda>& listaVendas) {
 
         getline(ss, campo, ',');
         std::string data = campo;
-
+//Cria um registroVenda e adiciona ao vetor
         RegistroVenda registro = {pedido, produto, qtd, preco, data};
         listaVendas.push_back(registro);
     }
-
+//fecha o arquivo e exibe que foi importado
     arquivo.close();
     std::cout << "Dados importados com sucesso.\n";
     return true;
 }
-
+//funcao calcular o total faturado
 double calcularTotalFaturado(const std::vector<RegistroVenda>& listaVendas) {
+//variavel contador
     double total = 0.0;
 
+    //contador
     for (const auto& venda : listaVendas) {
         total += venda.quantidadeVendida * venda.precoUnitario;
     }
 
     return total;
 }
-
+//Percorre todas as vendas, somando a quantidade por produto.
 std::string obterProdutoMaisVendido(const std::vector<RegistroVenda>& listaVendas) {
     std::map<std::string, int> contagemProdutos;
 
@@ -102,6 +112,7 @@ std::string obterProdutoMaisVendido(const std::vector<RegistroVenda>& listaVenda
     int maiorQuantidade = 0;
 
     for (const auto& item : contagemProdutos) {
+    for (const auto& item : contagemProdutos) {
         if (item.second > maiorQuantidade) {
             maiorQuantidade = item.second;
             produtoMaisVendido = item.first;
@@ -110,7 +121,7 @@ std::string obterProdutoMaisVendido(const std::vector<RegistroVenda>& listaVenda
 
     return produtoMaisVendido;
 }
-
+//Soma a receita total por produto.
 std::string obterProdutoMaisRentavel(const std::vector<RegistroVenda>& listaVendas) {
     std::map<std::string, double> receitaProdutos;
 
